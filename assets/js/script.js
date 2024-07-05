@@ -56,19 +56,26 @@ function getWeatherData(lat, lon) {
     });
 }
 
+function convertDate(day) {
+    // Convert Unix timestamp to milliseconds
+    let milliseconds = (day) * 1000;
+    // Create a new Date object with the milliseconds
+    let dateObject = new Date(milliseconds);
+    // Format the date as a string with only the date
+    let formattedDate = dateObject.toLocaleDateString();
+    return formattedDate;
+}
+
 function displayWeather(weather) {
     console.log(weather);
-    // Convert Unix timestamp to milliseconds
-    var milliseconds = (weather.list[0].dt) * 1000;
-    // Create a new Date object with the milliseconds
-    var dateObject = new Date(milliseconds);
-    // Format the date as a string with only the date
-    var formattedDate = dateObject.toLocaleDateString();
+    const currentDay = weather.list[0].dt
+    let formattedDate = convertDate(currentDay);
 
+    // Create and display card containing the current weather
     const currentCard = $('<div>')
     .addClass('col-md-9 border border-dark');
 
-    const h2El = $('<h2>')
+    const h2 = $('<h2>')
     .text(`${weather.city.name} (${formattedDate})`);
 
     const p1 = $('<p>')
@@ -81,9 +88,43 @@ function displayWeather(weather) {
     .text(`Humidity: ${weather.list[0].main.humidity} %`);
 
     $('#current-weather').append(currentCard);
-    currentCard.append(h2El, p1, p2, p3);
+    currentCard.append(h2, p1, p2, p3);
     
-    getNextFiveDays(weather);
+    // Getting the next five days and creating cards for each day
+    const futureWeather = getNextFiveDays(weather);
+    console.log(futureWeather);
+    for (let i = 0; i < futureWeather.length; i++) {
+        
+        formattedDate = convertDate(futureWeather[i].dt);
+        
+        const cardRow = $('<div>')
+        .addClass('col-md-2');
+
+        const futureCard = $('<article>')
+        .addClass('col-12 bg-primary p-3');
+
+        const h3El = $('<h3>')
+        .text(`${formattedDate}`)
+        .addClass('text-light');
+
+        const p1El = $('<p>')
+        .text(`Temp: ${futureWeather[i].main.temp}°F`)
+        .addClass('text-light');
+
+        const p2El = $('<p>')
+        .text(`Wind: ${futureWeather[i].wind.speed} MPH`)
+        .addClass('text-light');
+
+        const p3El = $('<p>')
+        .text(`Humidity: ${futureWeather[i].main.humidity} %`)
+        .addClass('text-light');
+
+        futureCard.append(h3El, p1El, p2El, p3El);
+        
+        cardRow.append(futureCard);
+
+        $('#future-row').append(cardRow);
+    }
 }
 
 function getNextFiveDays(forcast) {
@@ -107,6 +148,7 @@ function getNextFiveDays(forcast) {
 
     // Extract one forecast entry for each day at noon
     const filteredForecast = Object.values(groupedByDate);
+    return filteredForecast;
 }
 
 
