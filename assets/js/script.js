@@ -85,6 +85,7 @@ function convertDate(day) {
     return formattedDate;
 }
 
+// The main display function, this displays all of the weather data
 function displayWeather(weather) {
     console.log(weather);
     const currentDay = weather.list[0].dt
@@ -96,10 +97,14 @@ function displayWeather(weather) {
 
     // Create and display card containing the current weather
     const currentCard = $('<div>')
-    .addClass('col-md-9 border border-dark');
+    .addClass('col-md-9 border border-dark m-3');
 
     const h2 = $('<h2>')
-    .text(`${weather.city.name} (${formattedDate})`);
+    .text(`${weather.city.name} (${formattedDate}) `);
+    // Gets the weather icon from OpenWeather by plugging in the icon code
+    let iconUrl = `https://openweathermap.org/img/w/${weather.list[0].weather[0].icon}.png`;
+    let iconImg = $('<img>').attr('src', iconUrl);
+    h2.append(iconImg);
 
     const p1 = $('<p>')
     .text(`Temp: ${weather.list[0].main.temp}°F`);
@@ -127,14 +132,18 @@ function displayWeather(weather) {
         formattedDate = convertDate(futureWeather[i].dt);
         
         const cardRow = $('<div>')
-        .addClass('col-md-2');
+        .addClass('col-xl-2 col-lg-3 col-md-4 col-sm-4 col-6 p-3 m-2');
 
         const futureCard = $('<article>')
-        .addClass('col-12 bg-primary p-3');
+        .addClass('card bg-primary text-light p-3 text-nowrap');
 
         const h3El = $('<h3>')
         .text(`${formattedDate}`)
-        .addClass('text-light');
+        .addClass('card-title');
+
+        // Gets the weather icon from OpenWeather by plugging in the icon code
+        iconUrl = `https://openweathermap.org/img/w/${futureWeather[i].weather[0].icon}.png`;
+        iconImg = $('<img>').attr('src', iconUrl).addClass('weather-icon');
 
         const p1El = $('<p>')
         .text(`Temp: ${futureWeather[i].main.temp}°F`)
@@ -148,7 +157,7 @@ function displayWeather(weather) {
         .text(`Humidity: ${futureWeather[i].main.humidity} %`)
         .addClass('text-light');
 
-        futureCard.append(h3El, p1El, p2El, p3El);
+        futureCard.append(h3El, iconImg, p1El, p2El, p3El);
         
         cardRow.append(futureCard);
 
@@ -158,6 +167,7 @@ function displayWeather(weather) {
     renderHistory();
 }
 
+// Filters through all of the weather data and grabs the 3:00pm data for the next 5 days
 function getNextFiveDays(forcast) {
     // Get today's date
     const today = new Date();
@@ -170,7 +180,7 @@ function getNextFiveDays(forcast) {
     const time = entry.dt_txt.split(' ')[1]; // Extract time from timestamp
 
     // Check if the time is around noon and the date is not today
-    if (time.includes('12:00') && date !== todayDate) {
+    if (time.includes('15:00') && date !== todayDate) {
         if (!groupedByDate[date]) {
             groupedByDate[date] = entry;
         }
@@ -199,7 +209,7 @@ function renderHistory() {
 
     for (let city of cities) {
         let cityBtn = $('<button>')
-        .addClass('btn btn-secondary text-dark history-btn col-12 m-2')
+        .addClass('btn btn-secondary history-btn col-12 m-2')
         .text(city.name)
         .attr('data-name', city.name);
         $('.history-btn').on('click', handleHistoryClick);
@@ -209,25 +219,31 @@ function renderHistory() {
 
 }
 
+// This changes the weather results to whatever city button that is clicked on
 function handleHistoryClick() {
     const cityName = $(this).attr('data-name');
 
+    // Finding the city in the array that matches the button that was clicked on
     let cities = readCitiesFromStorage();
     const selectedCity = cities.find(city => city.name === cityName);
     
+    // Plugging in the latitude and longitude of the city that was clicked on
     if(selectedCity) {
         const lat = selectedCity.latitude;
         const lon = selectedCity.longitude;
-        
         getWeatherData(lat, lon);
     } else {
         console.log('City not found in storage');
     }
 }
 
-
+// This is making sure the page is fully loaded before running anything
 $(document).ready(function () {
+    // Displays the city history
+    renderHistory();
+    
     searchForm.on('submit', handleSearch);
 
+    // Event delegation for the city history buttons
     $('#city-history').on('click', '.history-btn', handleHistoryClick);
 });
