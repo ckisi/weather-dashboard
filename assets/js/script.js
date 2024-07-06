@@ -13,6 +13,8 @@ function handleSearch(event) {
     }
 
     getCityData(cityInput);
+
+    citySearch.val('');
 }
 
 // This gets the latitude and longitude of the city that was searched for
@@ -27,6 +29,23 @@ function getCityData(city) {
                 const lat = cityCoords[0].lat;
                 const lon = cityCoords[0].lon;
                 getWeatherData(lat, lon);
+
+                // Create city object
+                const newCity = {
+                    name: city,
+                    latitude: lat,
+                    longitude: lon,
+                }
+
+                // Push city object to local storage
+                let cities = readCitiesFromStorage();
+                const cityExists = cities.some(city => city.name === newCity.name);
+                if (!cityExists) {
+                    cities.push(newCity);
+                    localStorage.setItem('cities', JSON.stringify(cities));
+                }
+
+
             });
         } else {
             alert('Error');
@@ -71,6 +90,10 @@ function displayWeather(weather) {
     const currentDay = weather.list[0].dt
     let formattedDate = convertDate(currentDay);
 
+    $('#current-weather').empty();
+    $('#future-row').empty();
+    $('#city-history').empty();
+
     // Create and display card containing the current weather
     const currentCard = $('<div>')
     .addClass('col-md-9 border border-dark');
@@ -93,6 +116,12 @@ function displayWeather(weather) {
     // Getting the next five days and creating cards for each day
     const futureWeather = getNextFiveDays(weather);
     console.log(futureWeather);
+    
+    const forcastHeaderEl = $('<h2>')
+    .text('5-Day Forcast:');
+
+    $('#future-row').append(forcastHeaderEl);
+    
     for (let i = 0; i < futureWeather.length; i++) {
         
         formattedDate = convertDate(futureWeather[i].dt);
@@ -125,6 +154,8 @@ function displayWeather(weather) {
 
         $('#future-row').append(cardRow);
     }
+
+    renderHistory();
 }
 
 function getNextFiveDays(forcast) {
@@ -151,5 +182,52 @@ function getNextFiveDays(forcast) {
     return filteredForecast;
 }
 
+// Gets the cities array from local storage
+function readCitiesFromStorage() {
+    let cities = JSON.parse(localStorage.getItem('cities'));
 
-searchForm.on('submit', handleSearch);
+    if (!cities) {
+        cities = [];
+    }
+
+    return cities;
+}
+
+// Displays the city history list
+function renderHistory() {
+    let cities = readCitiesFromStorage();
+
+    for (let city of cities) {
+        let cityBtn = $('<button>')
+        .addClass('btn btn-secondary text-dark history-btn col-12 m-2')
+        .text(city.name)
+        .attr('data-name', city.name);
+        $('.history-btn').on('click', handleHistoryClick);
+
+        $('#city-history').append(cityBtn);
+    }
+
+}
+
+function handleHistoryClick() {
+    const cityName = $(this).attr('data-name');
+
+    let cities = readCitiesFromStorage();
+    const selectedCity = cities.find(city => city.name === cityName);
+    
+    if(selectedCity) {
+        const lat = selectedCity.latitude;
+        const lon = selectedCity.longitude;
+        
+        getWeatherData(lat, lon);
+    } else {
+        console.log('City not found in storage');
+    }
+}
+
+
+$(document).ready(function () {
+    searchForm.on('submit', handleSearch);
+
+    $('#city-history').on('click', '.history-btn', handleHistoryClick);
+});
