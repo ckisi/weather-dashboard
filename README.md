@@ -23,8 +23,8 @@ https://ckisi.github.io/weather-dashboard/
 https://github.com/ckisi/weather-dashboard
 
 ## Screenshots
-![](linkhere)
-![](linkhere)
+![](./assets/weatherss1.png)
+![](./assets/weatherss2.png)
 
 ## Credits
 Xpert Learning Assistant
