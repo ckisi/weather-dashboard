@@ -1,8 +1,7 @@
 # weather-dashboard
 
 ## Description
-This is a weather dashboard for travelers, so that they can see they weather forcast for any given city, and will be able to plan a trip accordingly. It shows the current weather, as well as the weather for the next five days.
-
+This is a weather dashboard for travelers, so that they can see they weather forcast for any given city, and will be able to plan a trip accordingly. It shows the current weather, as well as the weather for the next five days. It also logs your city history for ease of access.
 ## Usage
 Simply type in a city and click search, and the weather for that city will be displayed on the page. The weather includes temperature, humidity, wind speed, and a symbol of the weather conditions. The current weather shows the weather result for whatever the closest time is. The next 5 days forcast uses the weather forcast at noon for each day. Whenever you search for a city, it will be saved to the history, which is on the left sidebar. The history persists even when you leave the page, so when you come back to the website, you can access the cities you searched without having to retype them in.
 
