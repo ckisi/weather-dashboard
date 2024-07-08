@@ -163,7 +163,6 @@ function displayWeather(weather) {
 
         $('#future-row').append(cardRow);
     }
-
     renderHistory();
 }
 
@@ -180,7 +179,7 @@ function getNextFiveDays(forcast) {
     const time = entry.dt_txt.split(' ')[1]; // Extract time from timestamp
 
     // Check if the time is around noon and the date is not today
-    if (time.includes('15:00') && date !== todayDate) {
+    if (time.includes('12:00') && date !== todayDate) {
         if (!groupedByDate[date]) {
             groupedByDate[date] = entry;
         }
